@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('login', [LoginController::class, 'login'])->name('api.login')
+    ->withoutMiddleware('auth:sanctum');
+
+// Group for routes that require authentication
+Route::middleware('auth:sanctum','hasPermission')->group(function () {
+
+    Route::get('profile', [ProfileController::class, 'show']);
+    Route::post('logout', [LoginController::class, 'logout'])->name('api.logout');
+    
 });
