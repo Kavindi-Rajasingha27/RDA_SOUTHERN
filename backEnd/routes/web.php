@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisterController;
+use Illuminate\Validation\UnauthorizedException;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +14,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::match(['get', 'post'], '/unauthorized', function() {
+    return response()->json(['error' => 'Unauthorized action.'], 401);
+})->name('unauthorized');
