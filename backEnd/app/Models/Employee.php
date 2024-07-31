@@ -9,9 +9,10 @@ class Employee extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'employee_number';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
+        'employee_number',
         'name',
         'age',
         'address',
@@ -25,11 +26,11 @@ class Employee extends Model
 
     public function dependents()
     {
-        return $this->hasMany(Dependent::class, 'employee_id', 'employee_number');
+        return $this->hasMany(Dependent::class, 'employee_id', 'id');
     }
 
     public function qualifications()
     {
-        return $this->hasMany(Qualification::class, 'employee_id', 'employee_number');
+        return $this->hasMany(Qualification::class, 'employee_id', 'id');
     }
 }

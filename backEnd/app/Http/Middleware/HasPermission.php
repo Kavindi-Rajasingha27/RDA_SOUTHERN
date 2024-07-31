@@ -17,11 +17,7 @@ class HasPermission
      */
     public function handle($request, Closure $next)
     {
-        if (auth('sanctum')->check()) {
-            $status = auth('sanctum')->user()->status;
-            if($status != 'active'){
-                return response()->json(['error' => 'User Not Active'], 401);
-            }   
+        if (auth('sanctum')->check()) {  
             return $next($request);
         }
         else{

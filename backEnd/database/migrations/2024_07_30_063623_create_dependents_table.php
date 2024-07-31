@@ -16,14 +16,13 @@ class CreateDependentsTable extends Migration
         Schema::create('dependents', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('employee_id');
-            $table->foreign('employee_id')->references('employee_number')->on('employees')->onDelete('cascade');
+            $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->string('name');
             $table->string('relationship');
             $table->date('birth_date');
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      *
