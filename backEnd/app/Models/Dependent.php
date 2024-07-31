@@ -18,6 +18,6 @@ class Dependent extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employee_id', 'employee_number');
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 }
