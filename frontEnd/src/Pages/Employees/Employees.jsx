@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -19,57 +20,34 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Formik, Form, Field, FieldArray } from "formik";
 
-const Employees = () => {
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      mobile: "123-456-7890",
-      address: "123 Main St, New York, NY",
-      designation: "Engineer",
-      age: 30,
-      birthday: "1994-05-21",
-      corporateTitle: "Senior Engineer",
-      joinDate: "2018-07-16",
-      etfNumber: "ET123456",
-      dependents: [
-        { name: "Jane Doe", relationship: "Spouse", birthdate: "1990-02-11" },
-      ],
-      qualifications: [
-        {
-          qualificationName: "B.Sc. Engineering",
-          institute: "MIT",
-          obtainedDate: "2016-05-10",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      mobile: "987-654-3210",
-      address: "456 Elm St, San Francisco, CA",
-      designation: "Marketing Manager",
-      age: 28,
-      birthday: "1996-08-15",
-      corporateTitle: "Marketing Director",
-      joinDate: "2020-09-23",
-      etfNumber: "ET654321",
-      dependents: [
-        { name: "John Smith", relationship: "Spouse", birthdate: "1992-06-25" },
-      ],
-      qualifications: [
-        {
-          qualificationName: "MBA",
-          institute: "Harvard",
-          obtainedDate: "2018-09-15",
-        },
-      ],
-    },
-  ]);
+const API_BASE_URL = "https://api.waverista.com/public/api";
 
+const Employees = () => {
+  const [employees, setEmployees] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
+
+  const token = localStorage.getItem("token");
+  const axiosConfig = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/employees`,
+          axiosConfig
+        );
+        setEmployees(response.data);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -78,13 +56,27 @@ const Employees = () => {
     setTabIndex(0);
   };
 
-  const handleDelete = (id) => {
-    setEmployees(employees.filter((employee) => employee.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/employees/${id}`, axiosConfig);
+      setEmployees(employees.filter((employee) => employee.id !== id));
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+    }
   };
 
-  const handleAddEmployee = (values) => {
-    setEmployees([...employees, values]);
-    handleClose();
+  const handleAddEmployee = async (values) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/employees`,
+        values,
+        axiosConfig
+      );
+      setEmployees([...employees, response.data]);
+      handleClose();
+    } catch (error) {
+      console.error("Error adding employee:", error);
+    }
   };
 
   const handleView = (employee) => {
@@ -266,18 +258,29 @@ const Employees = () => {
                 ],
               }
             }
-            onSubmit={(values, { resetForm }) => {
-              if (selectedEmployee) {
-                setEmployees(
-                  employees.map((employee) =>
-                    employee.id === selectedEmployee.id ? values : employee
-                  )
-                );
-              } else {
-                handleAddEmployee(values);
+            onSubmit={async (values, { resetForm }) => {
+              try {
+                if (selectedEmployee) {
+                  const response = await axios.put(
+                    `${API_BASE_URL}/employees/${selectedEmployee.id}`,
+                    values,
+                    axiosConfig
+                  );
+                  setEmployees(
+                    employees.map((employee) =>
+                      employee.id === selectedEmployee.id
+                        ? response.data
+                        : employee
+                    )
+                  );
+                } else {
+                  await handleAddEmployee(values);
+                }
+                resetForm();
+                handleClose();
+              } catch (error) {
+                console.error("Error submitting form:", error);
               }
-              resetForm();
-              handleClose();
             }}
           >
             {({ values, handleSubmit }) => (
