@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EstimatedRouteController;
 use App\Http\Controllers\ProfileController;
 
 Route::post('login', [LoginController::class, 'login'])->name('api.login')
@@ -29,4 +30,7 @@ Route::middleware('auth:sanctum','hasPermission')->group(function () {
     Route::put('employees/{employee}/qualifications/{qualification}', [EmployeeController::class, 'updateQualification']);
     Route::delete('employees/{employee}/qualifications/{qualification}', [EmployeeController::class, 'destroyQualification']);
     
+    Route::post('/save-estimated-route', [EstimatedRouteController::class, 'storeEstimatedRoute']);
+    Route::get('/estimated-routes', [EstimatedRouteController::class, 'getEstimatedRoutes']);
+    Route::delete('/estimated-routes/{id}', [EstimatedRouteController::class, 'destroyEstimatedRoute']);
 });
