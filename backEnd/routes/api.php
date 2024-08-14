@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EstimatedRouteController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EstimateController; // Add this line
 
 Route::post('login', [LoginController::class, 'login'])->name('api.login')
     ->withoutMiddleware('auth:sanctum');
 
-
-Route::middleware('auth:sanctum','hasPermission')->group(function () {
+Route::middleware('auth:sanctum', 'hasPermission')->group(function () {
 
     Route::get('profile', [ProfileController::class, 'show']);
     Route::post('logout', [LoginController::class, 'logout'])->name('api.logout');
@@ -33,4 +33,10 @@ Route::middleware('auth:sanctum','hasPermission')->group(function () {
     Route::post('/save-estimated-route', [EstimatedRouteController::class, 'storeEstimatedRoute']);
     Route::get('/estimated-routes', [EstimatedRouteController::class, 'getEstimatedRoutes']);
     Route::delete('/estimated-routes/{id}', [EstimatedRouteController::class, 'destroyEstimatedRoute']);
+    
+    Route::post('/save-estimate', [EstimateController::class, 'store']);
+    Route::get('/estimates', [EstimateController::class, 'index']);
+    Route::get('/estimates/{id}', [EstimateController::class, 'show']);
+    Route::put('/estimates/{id}', [EstimateController::class, 'update']);
+    Route::delete('/estimates/{id}', [EstimateController::class, 'destroy']);
 });
