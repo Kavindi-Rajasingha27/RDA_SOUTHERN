@@ -1,0 +1,28 @@
+.about-section {
+  background-color: #1a1a1a;
+  padding: 50px 0 100px 0;
+  color: #ffcc00;
+}
+
+.about-section .container {
+  text-align: center;
+}
+
+.about-section h2 {
+  margin-bottom: 20px;
+}
+
+.about-section p {
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+.about-section button {
+  background-color: #ffcc00;
+  width: 100px;
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+}

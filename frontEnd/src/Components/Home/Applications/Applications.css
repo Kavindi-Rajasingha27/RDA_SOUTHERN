@@ -1,0 +1,36 @@
+.applications {
+  background-color: #1a1a1a;
+  padding: 100px 0 50px 0;
+}
+
+.applications h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #ffcc00;
+}
+
+.application-cards {
+  display: flex;
+  justify-content: space-between;
+}
+
+.card {
+  background-color: #333333;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: #ffcc00;
+}
+
+.card img {
+  max-width: 100%;
+  height: auto;
+}
+
+.card h3 {
+  margin: 20px 0 10px;
+}
+
+.card p {
+  color: #ffffff;
+}

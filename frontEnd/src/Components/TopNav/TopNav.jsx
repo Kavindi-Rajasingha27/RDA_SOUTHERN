@@ -96,6 +96,7 @@ const TopNav = () => {
             <>
               <LinkStyled to="/employees">Employees</LinkStyled>
               <LinkStyled to="/map">Map</LinkStyled>
+              <LinkStyled to="/estimate">Estimate</LinkStyled>
             </>
           )}
           {isLoggedIn ? (

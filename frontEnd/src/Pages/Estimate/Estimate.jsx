@@ -1,20 +1,20 @@
 import React from "react";
 import TilePage from "../../Components/TilePage/TilePage";
 
-const Map = () => {
+const Estimate = () => {
   return (
     <>
       <div>
         <TilePage
           title={"Water Supplied Routes"}
-          linkName1={"Add Completed"}
-          linkName2={"Completed Routes"}
-          link1={"/add-completed-routes"}
-          link2={"/completed-routes"}
+          linkName1={"Estimate"}
+          linkName2={"Estimated Routes"}
+          link1={"/estimator"}
+          link2={"/estimated-routes"}
         />
       </div>
     </>
   );
 };
 
-export default Map;
+export default Estimate;
