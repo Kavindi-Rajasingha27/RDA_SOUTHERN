@@ -118,8 +118,8 @@ import { useAuth } from "../../AuthContext/AuthContext";
 import axios from "axios";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("assistant_engineer");
+  const [password, setPassword] = useState("ae@rda123");
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
