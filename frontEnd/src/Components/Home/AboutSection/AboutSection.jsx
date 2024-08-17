@@ -1,22 +1,34 @@
 import React from "react";
 import "./AboutSection.css";
+import { Link } from 'react-router-dom';
 
 const AboutSection = () => {
   return (
     <section className="about-section">
       <div className="container">
-        <h2>About Erie Water Works</h2>
+        <h2>Who we are</h2>
         <p>
-          On January 1st 1992, the Erie Water Works assumed operations of the
-          City of Erie’s water system. The Erie Water Works is an independent
-          organization whose goal is to operate, maintain and rehabilitate the
-          water system for the Erie, Pennsylvania region, while providing
-          service at an affordable cost. Working together to make a difference,
-          Water Works employees stand by the community they work for and their
-          Mission Statement.
+          The Road Development Authority (RDA), incorporated as a statutory body under the Ministry of
+          Highways by the RDA Act No.73 of 1981, became successor to the Department of Highways in 1986.
+          Since then, the RDA has become responsible for the maintenance and upgrading of the National
+          Highway Network. Road Development Authority is one of the institutions under the Ministry of
+          Highways which is the apex organization in Sri Lanka for the highways sector.
+          The National Road Network consists of 12,255.41km of trunk (A class) and main (B class) roads
+          and 312.59 km of expressways, and about 4,270 bridges as of the end of 2023. Road Development
+          Authority is responsible for the maintenance and development of the National Road Network and
+          planning, design, and construction of new highways, bridges, and expressways to augment the
+          existing road network.
         </p>
-        <button>Map</button>
-        <button>Estimate</button>
+
+
+        <Link to="/map">
+          <button>Map</button>
+        </Link>
+        <Link to="/estimate">
+          <button>Estimate</button>
+        </Link>
+
+
       </div>
     </section>
   );

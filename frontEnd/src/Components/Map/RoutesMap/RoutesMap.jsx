@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FeatureGroup, MapContainer, TileLayer, useMap } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 
-const API_BASE_URL = "https://api.waverista.com/public/api";
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 // Custom hook to handle routing control
 const RoutingControl = ({ routes, onDeleteRoute }) => {

@@ -5,11 +5,11 @@ const HeroSection = () => {
   return (
     <section className="hero-section">
       <div className="container header-content">
-        <h1>15 minute Online Monitoring of Microbiological Water Quality</h1>
+        <h1>The Road Development Authority</h1>
         <ul>
-          <li>Fully automated measurements</li>
-          <li>15 minute measurement time</li>
-          <li>30 minute cycle time including automatic cleaning</li>
+          <li>Obtaining Permission to Damage the Road with the View to get the Water Connection to a House</li>
+          <li>Obtaining Permission to Erect Buildings & Parapet Walls on Either Sides of a National Road</li>
+          <li>Obtaining Permission to Damage the Road with the View to get the Water Connection to a House</li>
         </ul>
         <button>Find Out More</button>
       </div>

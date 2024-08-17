@@ -14,7 +14,7 @@ import {
 } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 
-const API_BASE_URL = "https://api.waverista.com/public/api";
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const RoutingControl = ({ routes, onSelectRoute }) => {
   const map = useMap();

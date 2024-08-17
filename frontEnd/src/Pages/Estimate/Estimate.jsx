@@ -6,7 +6,7 @@ const Estimate = () => {
     <>
       <div>
         <TilePage
-          title={"Water Supplied Routes"}
+          title={"Apply for Water Supply"}
           linkName1={"Estimate"}
           linkName2={"Estimated Routes"}
           link1={"/estimator"}

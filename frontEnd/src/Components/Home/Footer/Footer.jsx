@@ -10,42 +10,44 @@ const Footer = () => {
             <h3>Quick Links</h3>
             <ul>
               <li>
-                <a href="#contact">I want to contact Erie Water Works</a>
+                <a href="#contact">I want to contact the RDA Southern Province Office</a>
               </li>
               <li>
-                <a href="#faqs">I want to read your FAQs</a>
+                <a href="#faqs">I want to read the RDA's FAQs</a>
               </li>
               <li>
-                <a href="#manage-account">
-                  I want to manage my account or pay my bill
+                <a href="#manage-project">
+                  I want to manage my road development project or make a payment
                 </a>
               </li>
               <li>
-                <a href="#availability">
-                  How do I know if water is available in my area?
+                <a href="#project-availability">
+                  How do I know if a road project is ongoing in my area?
                 </a>
               </li>
               <li>
-                <a href="#find-info">
-                  Where can I find info on the water quality in my area?
+                <a href="#road-conditions">
+                  Where can I find info on road conditions in my area?
                 </a>
               </li>
               <li>
-                <a href="#service-rates">
-                  Where can I find the water service rates for my area?
+                <a href="#development-guidelines">
+                  Where can I find the road development guidelines and standards?
                 </a>
               </li>
             </ul>
           </div>
+
           <div className="footer-column">
             <h3>Contact Information</h3>
             <ul>
-              <li>24 Hour Emergency: (814) 870-8087</li>
-              <li>Customer Service: (814) 870-8000 Ext. 7</li>
-              <li>Quality Questions: (814) 870-8080 Ext. 4</li>
-              <li>John J. McCormick Jr. Administration Building</li>
-              <li>340 West Bayfront Parkway</li>
-              <li>Erie, Pennsylvania 16507</li>
+              <li>24 Hour Emergency: +94 912 234 567</li>
+              <li>Customer Service: +94 912 345 678 Ext. 1</li>
+              <li>Quality Questions: +94 912 345 678 Ext. 2</li>
+              <li>RDA Southern Provincial Office</li>
+              <li>No. 123 Galle Road</li>
+              <li>Matara, Sri Lanka</li>
+
             </ul>
           </div>
         </div>

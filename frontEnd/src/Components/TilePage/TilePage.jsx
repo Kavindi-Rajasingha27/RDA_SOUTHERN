@@ -15,7 +15,7 @@ const TilePage = ({ title, linkName1, linkName2, link1, link2 }) => {
           </div>
           <div className="title-info">
             <h3>{linkName1}</h3>
-            <p>SIMS ID Support and User Guide</p>
+            <p>Click below to add</p>
             <span className="badge">
               <Link
                 style={{ color: "#ffcc00", textDecoration: "none" }}
@@ -29,11 +29,11 @@ const TilePage = ({ title, linkName1, linkName2, link1, link2 }) => {
         </div>
         <div className="title-card">
           <div className="title-icon">
-            <i className="fas fa-users"></i>
+            <i className="fas fa-list"></i>
           </div>
           <div className="title-info">
             <h3>{linkName2}</h3>
-            <p>SIMS Parent App Web Interface</p>
+            <p>Click below to view</p>
             <span className="badge">
               <Link
                 style={{ color: "#ffcc00", textDecoration: "none" }}
