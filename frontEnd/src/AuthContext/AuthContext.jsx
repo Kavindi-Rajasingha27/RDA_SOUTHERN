@@ -6,20 +6,40 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
+    const checkAuthStatus = () => {
+      const storedToken = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+
+      if (storedToken) {
         setToken(storedToken);
-        setUser(parsedUser);
         setIsLoggedIn(true);
-      } catch (e) {
-        console.error("Error parsing user data from localStorage", e);
+
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+          } catch (e) {
+            console.error("Error parsing user data from localStorage", e);
+            // If there's an error parsing the user data, we'll just set it to null
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
+      } else {
+        // If there's no token, ensure we're logged out
+        setIsLoggedIn(false);
+        setUser(null);
+        setToken(null);
       }
-    }
+
+      setLoading(false);
+    };
+
+    checkAuthStatus();
   }, []);
 
   const login = (newToken, newUser) => {
@@ -37,6 +57,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsLoggedIn(false);
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Or any loading indicator
+  }
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, login, logout, token, user }}>

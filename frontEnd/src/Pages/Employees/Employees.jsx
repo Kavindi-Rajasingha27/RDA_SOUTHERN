@@ -20,7 +20,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Formik, Form, Field, FieldArray } from "formik";
 
-const API_BASE_URL = "https://api.waverista.com/public/api";
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
@@ -49,6 +49,46 @@ const Employees = () => {
     fetchEmployees();
   }, []);
 
+  const handleRemoveDependent = async (employeeId, dependentId) => {
+    try {
+      await axios.delete(
+        `${API_BASE_URL}/employees/${employeeId}/dependents/${dependentId}`,
+        axiosConfig
+      );
+      const updatedEmployee = (
+        await axios.get(`${API_BASE_URL}/employees/${employeeId}`, axiosConfig)
+      ).data;
+      setEmployees(
+        employees.map((employee) =>
+          employee.id === employeeId ? updatedEmployee : employee
+        )
+      );
+      setSelectedEmployee(updatedEmployee);
+    } catch (error) {
+      console.error("Error removing dependent:", error);
+    }
+  };
+
+  const handleRemoveQualification = async (employeeId, qualificationId) => {
+    try {
+      await axios.delete(
+        `${API_BASE_URL}/employees/${employeeId}/qualifications/${qualificationId}`,
+        axiosConfig
+      );
+      const updatedEmployee = (
+        await axios.get(`${API_BASE_URL}/employees/${employeeId}`, axiosConfig)
+      ).data;
+      setEmployees(
+        employees.map((employee) =>
+          employee.id === employeeId ? updatedEmployee : employee
+        )
+      );
+      setSelectedEmployee(updatedEmployee);
+    } catch (error) {
+      console.error("Error removing qualification:", error);
+    }
+  };
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
@@ -72,7 +112,26 @@ const Employees = () => {
         values,
         axiosConfig
       );
-      setEmployees([...employees, response.data]);
+      const newEmployee = response.data;
+
+      await Promise.all([
+        ...values.dependents.map((dependent) =>
+          axios.post(
+            `${API_BASE_URL}/employees/${newEmployee.id}/dependents`,
+            dependent,
+            axiosConfig
+          )
+        ),
+        ...values.qualifications.map((qualification) =>
+          axios.post(
+            `${API_BASE_URL}/employees/${newEmployee.id}/qualifications`,
+            qualification,
+            axiosConfig
+          )
+        ),
+      ]);
+
+      setEmployees((prev) => [...prev, newEmployee]);
       handleClose();
     } catch (error) {
       console.error("Error adding employee:", error);
@@ -86,6 +145,109 @@ const Employees = () => {
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
+  };
+
+  // const handleUpdateEmployee = async (values) => {
+  //   try {
+  //     const response = await axios.put(
+  //       `${API_BASE_URL}/employees/${selectedEmployee.id}`,
+  //       values,
+  //       axiosConfig
+  //     );
+
+  //     await Promise.all([
+  //       ...values.dependents.map((dependent) =>
+  //         dependent.id
+  //           ? axios.put(
+  //               `${API_BASE_URL}/employees/${selectedEmployee.id}/dependents/${dependent.id}`,
+  //               dependent,
+  //               axiosConfig
+  //             )
+  //           : axios.post(
+  //               `${API_BASE_URL}/employees/${selectedEmployee.id}/dependents`,
+  //               dependent,
+  //               axiosConfig
+  //             )
+  //       ),
+  //       ...values.qualifications.map((qualification) =>
+  //         qualification.id
+  //           ? axios.put(
+  //               `${API_BASE_URL}/employees/${selectedEmployee.id}/qualifications/${qualification.id}`,
+  //               qualification,
+  //               axiosConfig
+  //             )
+  //           : axios.post(
+  //               `${API_BASE_URL}/employees/${selectedEmployee.id}/qualifications`,
+  //               qualification,
+  //               axiosConfig
+  //             )
+  //       ),
+  //     ]);
+
+  //     setEmployees(
+  //       employees.map((employee) =>
+  //         employee.id === selectedEmployee.id ? response.data : employee
+  //       )
+  //     );
+  //     handleClose();
+  //   } catch (error) {
+  //     console.error("Error updating employee:", error);
+  //   }
+  // };
+
+  const handleUpdateEmployee = async (values) => {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/employees/${selectedEmployee.id}`,
+        values,
+        axiosConfig
+      );
+
+      await Promise.all([
+        ...values.dependents.map((dependent) =>
+          dependent.id
+            ? axios.put(
+                `${API_BASE_URL}/employees/${selectedEmployee.id}/dependents/${dependent.id}`,
+                dependent,
+                axiosConfig
+              )
+            : axios.post(
+                `${API_BASE_URL}/employees/${selectedEmployee.id}/dependents`,
+                dependent,
+                axiosConfig
+              )
+        ),
+        ...values.qualifications.map((qualification) =>
+          qualification.id
+            ? axios.put(
+                `${API_BASE_URL}/employees/${selectedEmployee.id}/qualifications/${qualification.id}`,
+                qualification,
+                axiosConfig
+              )
+            : axios.post(
+                `${API_BASE_URL}/employees/${selectedEmployee.id}/qualifications`,
+                qualification,
+                axiosConfig
+              )
+        ),
+      ]);
+
+      const updatedEmployee = (
+        await axios.get(
+          `${API_BASE_URL}/employees/${selectedEmployee.id}`,
+          axiosConfig
+        )
+      ).data;
+
+      setEmployees(
+        employees.map((employee) =>
+          employee.id === selectedEmployee.id ? updatedEmployee : employee
+        )
+      );
+      setSelectedEmployee(updatedEmployee);
+    } catch (error) {
+      console.error("Error updating employee:", error);
+    }
   };
 
   const modalStyle = {
@@ -129,7 +291,7 @@ const Employees = () => {
           marginBottom: 2,
         }}
       >
-        Employees Management
+        Employee Management
       </Typography>
       <TableContainer
         component={Paper}
@@ -166,7 +328,7 @@ const Employees = () => {
               <TableCell
                 sx={{ backgroundColor: "#FFC107", fontWeight: "bold" }}
               >
-                Mobile No
+                Mobile No/ Email
               </TableCell>
               <TableCell
                 sx={{ backgroundColor: "#FFC107", fontWeight: "bold" }}
@@ -193,9 +355,9 @@ const Employees = () => {
           <TableBody>
             {employees.map((employee) => (
               <TableRow key={employee.id}>
-                <TableCell>{employee.id}</TableCell>
+                <TableCell>{employee.employee_number}</TableCell>
                 <TableCell>{employee.name}</TableCell>
-                <TableCell>{employee.mobile}</TableCell>
+                <TableCell>{employee.contact_details}</TableCell>
                 <TableCell>{employee.address}</TableCell>
                 <TableCell>{employee.designation}</TableCell>
                 <TableCell>
@@ -240,39 +402,30 @@ const Employees = () => {
             {selectedEmployee ? "View Employee" : "Add Employee"}
           </Typography>
           <Formik
+            enableReinitialize
             initialValues={
               selectedEmployee || {
                 id: "",
+                employee_number: "",
                 name: "",
-                mobile: "",
+                contact_details: "",
                 address: "",
                 designation: "",
                 age: "",
                 birthday: "",
-                corporateTitle: "",
-                joinDate: "",
-                etfNumber: "",
-                dependents: [{ name: "", relationship: "", birthdate: "" }],
+                corporate_title: "",
+                join_date: "",
+                etf_number: "",
+                dependents: [],
                 qualifications: [
-                  { qualificationName: "", institute: "", obtainedDate: "" },
+                  
                 ],
               }
             }
             onSubmit={async (values, { resetForm }) => {
               try {
                 if (selectedEmployee) {
-                  const response = await axios.put(
-                    `${API_BASE_URL}/employees/${selectedEmployee.id}`,
-                    values,
-                    axiosConfig
-                  );
-                  setEmployees(
-                    employees.map((employee) =>
-                      employee.id === selectedEmployee.id
-                        ? response.data
-                        : employee
-                    )
-                  );
+                  await handleUpdateEmployee(values);
                 } else {
                   await handleAddEmployee(values);
                 }
@@ -308,7 +461,7 @@ const Employees = () => {
                   {tabIndex === 0 && (
                     <Box sx={tabContentStyle}>
                       <Field
-                        name="id"
+                        name="employee_number"
                         as={TextField}
                         label="Emp ID"
                         fullWidth
@@ -322,9 +475,9 @@ const Employees = () => {
                         sx={{ mb: 2 }}
                       />
                       <Field
-                        name="mobile"
+                        name="contact_details"
                         as={TextField}
-                        label="Mobile No"
+                        label="Mobile No/ Email"
                         fullWidth
                         sx={{ mb: 2 }}
                       />
@@ -359,14 +512,14 @@ const Employees = () => {
                         InputLabelProps={{ shrink: true }}
                       />
                       <Field
-                        name="corporateTitle"
+                        name="corporate_title"
                         as={TextField}
                         label="Corporate Title"
                         fullWidth
                         sx={{ mb: 2 }}
                       />
                       <Field
-                        name="joinDate"
+                        name="join_date"
                         as={TextField}
                         label="Join Date"
                         fullWidth
@@ -375,7 +528,7 @@ const Employees = () => {
                         InputLabelProps={{ shrink: true }}
                       />
                       <Field
-                        name="etfNumber"
+                        name="etf_number"
                         as={TextField}
                         label="ETF Number"
                         fullWidth
@@ -388,7 +541,7 @@ const Employees = () => {
                       <FieldArray name="dependents">
                         {({ push, remove }) => (
                           <>
-                            {values.dependents.map((_, index) => (
+                            {values.dependents.map((dependentItem, index) => (
                               <Box key={index} sx={{ mb: 2 }}>
                                 <Field
                                   name={`dependents.${index}.name`}
@@ -405,14 +558,27 @@ const Employees = () => {
                                   sx={{ mb: 1 }}
                                 />
                                 <Field
-                                  name={`dependents.${index}.birthdate`}
+                                  name={`dependents.${index}.birth_date`}
                                   as={TextField}
                                   label="Birthdate"
                                   type="date"
                                   fullWidth
                                   InputLabelProps={{ shrink: true }}
                                 />
-                                <Button onClick={() => remove(index)}>
+                                <Button
+                                  onClick={() => {
+                                    if (
+                                      selectedEmployee &&
+                                      values.dependents[index].id
+                                    ) {
+                                      handleRemoveDependent(
+                                        selectedEmployee.id,
+                                        values.dependents[index].id
+                                      );
+                                    }
+                                    remove(index);
+                                  }}
+                                >
                                   Remove
                                 </Button>
                               </Box>
@@ -422,7 +588,7 @@ const Employees = () => {
                                 push({
                                   name: "",
                                   relationship: "",
-                                  birthdate: "",
+                                  birth_date: "",
                                 })
                               }
                             >
@@ -441,7 +607,7 @@ const Employees = () => {
                             {values.qualifications.map((_, index) => (
                               <Box key={index} sx={{ mb: 2 }}>
                                 <Field
-                                  name={`qualifications.${index}.qualificationName`}
+                                  name={`qualifications.${index}.qualification_name`}
                                   as={TextField}
                                   label="Qualification Name"
                                   fullWidth
@@ -455,14 +621,27 @@ const Employees = () => {
                                   sx={{ mb: 1 }}
                                 />
                                 <Field
-                                  name={`qualifications.${index}.obtainedDate`}
+                                  name={`qualifications.${index}.obtained_date`}
                                   as={TextField}
                                   label="Obtained Date"
                                   type="date"
                                   fullWidth
                                   InputLabelProps={{ shrink: true }}
                                 />
-                                <Button onClick={() => remove(index)}>
+                                <Button
+                                  onClick={() => {
+                                    if (
+                                      selectedEmployee &&
+                                      values.qualifications[index].id
+                                    ) {
+                                      handleRemoveQualification(
+                                        selectedEmployee.id,
+                                        values.qualifications[index].id
+                                      );
+                                    }
+                                    remove(index);
+                                  }}
+                                >
                                   Remove
                                 </Button>
                               </Box>
@@ -470,9 +649,9 @@ const Employees = () => {
                             <Button
                               onClick={() =>
                                 push({
-                                  qualificationName: "",
+                                  qualification_name: "",
                                   institute: "",
-                                  obtainedDate: "",
+                                  obtained_date: "",
                                 })
                               }
                             >

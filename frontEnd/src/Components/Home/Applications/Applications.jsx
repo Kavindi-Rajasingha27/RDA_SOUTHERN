@@ -5,27 +5,25 @@ const Applications = () => {
   return (
     <section className="applications">
       <div className="container">
-        <h2>Applications</h2>
+        <h2>Services</h2>
         <div className="application-cards">
           <div className="card">
-            {/* <img src="/icons/drinking-water.png" alt="Drinking Water" /> */}
-            <i class="fa-solid fa-faucet-drip" style={{ fontSize: "50px" }}></i>
-            <h3>Drinking Water</h3>
-            <p>Lorem ipsum dolor sit amet...</p>
+            <i class="fa-solid fa-road" style={{ fontSize: "50px" }}></i>
+            <h3>Highway Develop</h3>
+            <p>Managing the develop...</p>
           </div>
           <div className="card">
-            {/* <img src="/icons/surface-water.png" alt="Surface Water" /> */}
-            <i class="fa-solid fa-water" style={{ fontSize: "50px" }}></i>
-            <h3>Surface Water</h3>
-            <p>Lorem ipsum dolor sit amet...</p>
+            <i class="fa-solid fa-map" style={{ fontSize: "50px" }}></i>
+            <h3>Road Mapping</h3>
+            <p>Creating and updati...</p>
           </div>
           <div className="card">
-            {/* <img src="/icons/waste-water.png" alt="Waste Water" /> */}
-            <i class="fa-solid fa-recycle" style={{ fontSize: "50px" }}></i>
-            <h3>Waste Water</h3>
-            <p>Lorem ipsum dolor sit amet...</p>
+            <i class="fa-solid fa-tools" style={{ fontSize: "50px" }}></i>
+            <h3>Road Maintenance</h3>
+            <p>Ensuring regular mai...</p>
           </div>
         </div>
+
       </div>
     </section>
   );
