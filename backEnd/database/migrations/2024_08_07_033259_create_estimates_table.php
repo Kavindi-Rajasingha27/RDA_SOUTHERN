@@ -19,6 +19,8 @@ class CreateEstimatesTable extends Migration
             $table->string('type')->nullable();
             $table->float('rate')->nullable();
             $table->json('waypoints');
+            $table->string('status')->default('pending');
+            $table->string('document_path')->nullable();
             $table->timestamps();
 
             // Create a generated column for spatial indexing

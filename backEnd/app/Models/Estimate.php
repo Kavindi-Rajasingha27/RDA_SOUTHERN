@@ -8,7 +8,18 @@ use Illuminate\Support\Facades\DB;
 class Estimate extends Model
 {
     protected $fillable = [
-        'name', 'start', 'end', 'distance', 'time', 'estimate', 'type', 'rate', 'waypoints', 'waypoints_geom',
+        'name',
+        'start',
+        'end',
+        'distance',
+        'time',
+        'estimate',
+        'type',
+        'rate',
+        'waypoints',
+        'waypoints_geom',
+        'status',
+        'document_path',
     ];
 
     protected $casts = [
