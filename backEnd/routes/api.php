@@ -10,6 +10,7 @@ use App\Http\Controllers\EstimateController; // Add this line
 Route::post('login', [LoginController::class, 'login'])->name('api.login')
     ->withoutMiddleware('auth:sanctum');
 
+    
 Route::middleware('auth:sanctum', 'hasPermission')->group(function () {
 
     Route::get('profile', [ProfileController::class, 'show']);
@@ -39,4 +40,7 @@ Route::middleware('auth:sanctum', 'hasPermission')->group(function () {
     Route::get('/estimates/{id}', [EstimateController::class, 'show']);
     Route::put('/estimates/{id}', [EstimateController::class, 'update']);
     Route::delete('/estimates/{id}', [EstimateController::class, 'destroy']);
+    Route::post('/estimates/update-status/{estimate}', [EstimateController::class, 'updateStatus']);
+    Route::get('/estimates/{id}/document', [EstimateController::class, 'downloadDocument']);
+
 });
