@@ -7,6 +7,8 @@ import "leaflet/dist/leaflet.css";
 import React, { useEffect, useRef, useState } from "react";
 import { FeatureGroup, MapContainer, TileLayer, useMap } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -136,7 +138,9 @@ const RoutesMap = ({ center, zoom }) => {
         setRoutes(data);
       } catch (error) {
         console.error("Error fetching routes:", error);
-        alert("Error fetching routes. Please try again later.");
+        toast.error("Error fetching routes. Please try again later.", {
+          position: "top-right",
+        });
       }
     };
 
@@ -145,6 +149,30 @@ const RoutesMap = ({ center, zoom }) => {
 
   const handleDeleteRoute = async (routeId) => {
     try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to delete it?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Delete it!",
+        cancelButtonText: "No, cancel!",
+        width: "500px",
+        customClass: {
+          icon: "swal-icon",
+          title: "swal-title",
+          content: "swal-text",
+          confirmButton: "swal-confirm-button",
+          cancelButton: "swal-cancel-button",
+        },
+      });
+
+      if (!result.isConfirmed) {
+        toast.info("Operation canceled.", {
+          position: "top-right",
+        });
+        return;
+      }
+
       await axios.delete(
         `${API_BASE_URL}/estimated-routes/${routeId}`,
         axiosConfig
@@ -154,8 +182,15 @@ const RoutesMap = ({ center, zoom }) => {
       setRoutes((prevRoutes) =>
         prevRoutes.filter((route) => route.id !== routeId)
       );
+
+      toast.success("Estimate deleted successfully!", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error deleting route:", error);
+      toast.error("Error deleting routes. Please try again later.", {
+        position: "top-right",
+      });
     }
   };
 

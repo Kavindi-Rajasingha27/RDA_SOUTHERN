@@ -12,6 +12,8 @@ import {
   TileLayer,
   useMapEvent,
 } from "react-leaflet";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -240,19 +242,52 @@ const AddRoutes = ({ center, zoom }) => {
   const saveRoute = async (routeData) => {
     console.log("routeData", routeData);
     try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save this route?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Save it!",
+        cancelButtonText: "No, cancel!",
+        width: "500px",
+        customClass: {
+          icon: "swal-icon",
+          title: "swal-title",
+          content: "swal-text",
+          confirmButton: "swal-confirm-button",
+          cancelButton: "swal-cancel-button",
+        },
+      });
+
+      if (!result.isConfirmed) {
+        toast.info("Operation canceled.", {
+          position: "top-right",
+        });
+        return;
+      }
+
       const response = await axios.post(
         `${API_BASE_URL}/save-estimated-route`,
         routeData,
         axiosConfig
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("Route saved successfully");
+        toast.success("Route saved successfully!", {
+          position: "top-right",
+        });
       } else {
         console.error("Failed to save route");
+        toast.error("Failed to save route.", {
+          position: "top-right",
+        });
       }
     } catch (error) {
       console.error("Error saving route:", error);
+      toast.error("Error saving route.", {
+        position: "top-right",
+      });
     }
   };
 

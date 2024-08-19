@@ -14,9 +14,13 @@
 .footer-links {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
+
 .footer-column {
-  width: 100%;
+  flex: 1; /* Allow columns to grow and shrink as needed */
+  min-width: 250px; /* Ensure columns are not too narrow */
+  margin: 0 15px; /* Space between columns */
 }
 
 .footer-column h3 {
@@ -37,6 +41,37 @@
   text-decoration: none;
 }
 
+.footer-column a:hover {
+  text-decoration: underline; /* Add underline on hover for better accessibility */
+}
+
 .footer-column p {
   margin-bottom: 10px;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  .footer {
+    padding: 30px 0; /* Adjust padding for smaller screens */
+  }
+
+  .footer-links {
+    flex-direction: column; /* Stack columns vertically */
+    align-items: center; /* Center-align content */
+  }
+
+  .footer-column {
+    width: 100%; /* Ensure columns take full width */
+    margin: 0 0 20px 0; /* Add margin between stacked columns */
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-column h3 {
+    font-size: 1.2em; /* Adjust font size */
+  }
+
+  .footer-column li {
+    font-size: 0.9em; /* Adjust font size for readability */
+  }
 }

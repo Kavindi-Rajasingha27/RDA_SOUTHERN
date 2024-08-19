@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  Paper,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Button,
-  IconButton,
+  Tabs,
   TextField,
   Typography,
-  Modal,
-  Box,
-  Tabs,
-  Tab,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Formik, Form, Field, FieldArray } from "formik";
+import axios from "axios";
+import { Field, FieldArray, Form, Formik } from "formik";
+import React, { useEffect, useState } from "react";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -285,9 +285,11 @@ const Employees = () => {
         variant="h6"
         component="div"
         sx={{
-          textAlign: "center",
+          textAlign: "left",
+          fontSize: "calc(1.325rem + .9vw)",
           fontWeight: "bold",
-          color: "black",
+          paddingLeft: 24,
+          color: "#ffcc00",
           marginBottom: 2,
         }}
       >
@@ -417,9 +419,7 @@ const Employees = () => {
                 join_date: "",
                 etf_number: "",
                 dependents: [],
-                qualifications: [
-                  
-                ],
+                qualifications: [],
               }
             }
             onSubmit={async (values, { resetForm }) => {

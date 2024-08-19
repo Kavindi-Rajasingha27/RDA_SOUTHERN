@@ -1,3 +1,15 @@
+import {
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import L from "leaflet";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -13,6 +25,8 @@ import {
   useMapEvent,
 } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -56,16 +70,18 @@ const RoutingControl = ({ routes, onSelectRoute }) => {
           iconSize: [100, 40],
         }),
       }).addTo(map);
-
-      // marker.on("click", () => {
-      //   if (
-      //     window.confirm(
-      //       `Do you want to add the route "${route.name || "Unnamed Route"}"?`
-      //     )
-      //   ) {
-      //     // onSelectRoute(route.distance);
-      //   }
-      // });
+      marker.getElement().style.cursor = "pointer";
+      //  marker.on("click", () => {
+      //    if (
+      //      window.confirm(
+      //        `Do you want to delete the route "${
+      //          route.name || "Unnamed Route"
+      //        }"?`
+      //      )
+      //    ) {
+      //      onDeleteRoute(route.id); // Call the parent component's function to handle deletion
+      //    }
+      //  });
 
       routingControlsRef.current.push(routingControl);
       markersRef.current.push(marker);
@@ -93,14 +109,6 @@ const RoutingControl = ({ routes, onSelectRoute }) => {
   return null;
 };
 
-// Define the rates for each road type
-const roadRates = {
-  CONCRETE: 50,
-  CARPET: 30,
-  THARA: 20,
-  GRANITE: 40,
-};
-
 const RouteEstimator = ({ center, zoom }) => {
   const token = localStorage.getItem("token");
   const axiosConfig = {
@@ -109,7 +117,6 @@ const RouteEstimator = ({ center, zoom }) => {
 
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
-
   const [selectedRoad, setSelectedRoad] = useState("");
   const [rate, setRate] = useState(0);
   const [area, setArea] = useState(0);
@@ -117,6 +124,7 @@ const RouteEstimator = ({ center, zoom }) => {
   const [routes, setRoutes] = useState([]);
   const [routeData, setRouteData] = useState(null);
   const [selectedArea, setSelectedArea] = useState(null);
+  const [open, setOpen] = useState(false);
   const featureGroupRef = useRef(null);
 
   const roadRates = useMemo(
@@ -137,17 +145,8 @@ const RouteEstimator = ({ center, zoom }) => {
         setEndPoint(e.latlng);
         addRoute(map, startPoint, e.latlng);
       } else {
-        // Reset points
         setStartPoint(e.latlng);
         setEndPoint(null);
-        // map.eachLayer((layer) => {
-        //   if (layer.options && layer.options.waypoints) {
-        //     map.removeLayer(layer);
-        //   }
-        // });
-
-        // setStartPoint(null);
-        // setEndPoint(null);
       }
     });
     return null;
@@ -174,6 +173,8 @@ const RouteEstimator = ({ center, zoom }) => {
             end: end,
             distance: summary.totalDistance,
             time: summary.totalTime,
+            type: selectedRoad,
+            rate: rate,
             estimate: summary.totalDistance * rate,
             waypoints: routes[0].waypoints.map((wp) => ({
               lat: wp.latLng.lat,
@@ -183,36 +184,64 @@ const RouteEstimator = ({ center, zoom }) => {
 
           setRouteData(routeData);
           handleClick(summary.totalDistance);
-          // Save the route to the server
+          // saveEstimate(routeData);
+          setOpen(false);
         });
       }
     }
   };
 
   const saveEstimate = async (routeData) => {
-    console.log("routeData", routeData);
-
     try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to submit the estimate?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Submit it!",
+        cancelButtonText: "No, cancel!",
+        width: "500px",
+        customClass: {
+          icon: "swal-icon",
+          title: "swal-title",
+          content: "swal-text",
+          confirmButton: "swal-confirm-button",
+          cancelButton: "swal-cancel-button",
+        },
+      });
+
+      if (!result.isConfirmed) {
+        toast.info("Operation canceled.", {
+          position: "top-right",
+        });
+        return;
+      }
+
       const response = await axios.post(
         `${API_BASE_URL}/save-estimate`,
         routeData,
         axiosConfig
       );
 
-      console.log("response", response);
-      console.log("response.status", response.status);
-
       if (response.status === 201) {
         const savedRoute = response.data;
         setRoutes((prevRoutes) => [...prevRoutes, savedRoute]);
+        toast.success("Estimate updated successfully!", {
+          position: "top-right",
+        });
       } else {
-        alert("Error saving the route. Please try again.");
+        toast.error("Error saving the route. Please try again.", {
+          position: "top-right",
+        });
       }
     } catch (error) {
       console.error("Error saving the route:", error);
-      alert("Error saving the route. Please try again.");
+      toast.error("Error saving the route. Please try again.", {
+        position: "top-right",
+      });
     }
   };
+
   useEffect(() => {
     const fetchRoutes = async (area) => {
       try {
@@ -223,11 +252,12 @@ const RouteEstimator = ({ center, zoom }) => {
         });
 
         const data = response.data;
-        console.log("data", data);
         setRoutes(data);
       } catch (error) {
         console.error("Error fetching routes:", error);
-        alert("Error fetching routes. Please try again later.");
+        toast.error("Error fetching routes. Please try again later.", {
+          position: "top-right",
+        });
       }
     };
 
@@ -239,6 +269,7 @@ const RouteEstimator = ({ center, zoom }) => {
     setSelectedRoad(roadType);
     setRate(roadRates[roadType]);
     setAmount(area * roadRates[roadType]);
+    selectedRoad == "" && setOpen(true);
   };
 
   const handleClick = (routeDistance) => {
@@ -256,64 +287,205 @@ const RouteEstimator = ({ center, zoom }) => {
     }
   };
 
+  const handleReset = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to reset?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Reset it!",
+      cancelButtonText: "No, cancel!",
+      width: "500px",
+      customClass: {
+        icon: "swal-icon",
+        title: "swal-title",
+        content: "swal-text",
+        confirmButton: "swal-confirm-button",
+        cancelButton: "swal-cancel-button",
+      },
+    });
+
+    if (!result.isConfirmed) {
+      toast.info("Operation canceled.", {
+        position: "top-right",
+      });
+      return;
+    }
+    setStartPoint(null);
+    setEndPoint(null);
+    setSelectedRoad("");
+    setRate(0);
+    setArea(0);
+    setAmount(0);
+    // setRoutes([]);
+    setRouteData(null);
+    setSelectedArea(null);
+    setOpen(false);
+  };
+
   return (
-    <div>
-      <h1>Road Cost Estimator</h1>
-      <label>
-        Road Type:
-        <select value={selectedRoad} onChange={handleRoadChange}>
-          <option value="">Select Road Type</option>
-          <option value="CONCRETE">Concrete</option>
-          <option value="CARPET">Carpet</option>
-          <option value="THARA">Thara</option>
-          <option value="GRANITE">Granite</option>
-        </select>
-      </label>
-      <br />
-      <label>Rate: {rate}</label>
-      <br />
-      <label>
-        Area (sq. units):
-        <input type="text" value={area} disabled />
-      </label>
-      <br />
-      <label>Amount: {amount}</label>
-      <button
-        type="submit"
-        onClick={() => {
-          saveEstimate(routeData);
+    <Container
+      maxWidth="none"
+      sx={{ padding: 3, bgcolor: "#000000", height: "100vh" }}
+    >
+      <Box sx={{ marginBottom: 3 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ color: "#FFD700", fontWeight: 600 }}
+        >
+          Road Cost Estimator
+        </Typography>
+      </Box>
+      <Box sx={{ marginBottom: 3 }}>
+        <Typography
+          variant="h6"
+          component="h2"
+          gutterBottom
+          sx={{ color: "#FFD700" }}
+        >
+          Select Road Type
+        </Typography>
+        <Select
+          value={selectedRoad}
+          onChange={handleRoadChange}
+          fullWidth
+          sx={{
+            bgcolor: "#000000",
+            color: "#FFD700",
+            borderColor: "#FFD700",
+            "& .MuiSelect-select": {
+              bgcolor: "#000000",
+              color: "#FFD700",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#FFD700",
+            },
+          }}
+        >
+          <MenuItem value="" sx={{ color: "#000000" }}>
+            Select Road Type
+          </MenuItem>
+          <MenuItem value="CONCRETE">Concrete</MenuItem>
+          <MenuItem value="CARPET">Carpet</MenuItem>
+          <MenuItem value="THARA">Thara</MenuItem>
+          <MenuItem value="GRANITE">Granite</MenuItem>
+        </Select>
+      </Box>
+      <Box sx={{ marginBottom: 3, color: "#FFD700" }}>
+        <Typography variant="body1" component="p">
+          Estimated Area: {area} m
+        </Typography>
+        <Typography variant="body1" component="p">
+          Estimated Amount: Rs. {amount}
+        </Typography>
+      </Box>
+      <Button
+        variant="contained"
+        onClick={() => saveEstimate(routeData)}
+        sx={{
+          bgcolor: "#FFD700",
+          color: "#000000",
+          "&:hover": {
+            bgcolor: "#FFC107",
+          },
+          marginTop: 2,
         }}
       >
         Submit Estimate
-      </button>
-      {selectedRoad && (
-        <MapContainer
-          center={center}
-          zoom={zoom}
-          style={{ height: "100vh", width: "100%" }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <MapEventHandler />
-          <RoutingControl routes={routes} onSelectRoute={handleClick} />
-          <FeatureGroup ref={featureGroupRef}>
-            <EditControl
-              position="topleft"
-              onCreated={handleCreated}
-              draw={{
-                rectangle: false,
-                circle: false,
-                circlemarker: false,
-                marker: false,
-                polyline: false,
-              }}
-            />
-          </FeatureGroup>
-        </MapContainer>
-      )}
-    </div>
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleReset}
+        sx={{
+          bgcolor: "#FF5722",
+          color: "#FFFFFF",
+          "&:hover": {
+            bgcolor: "#E64A19",
+          },
+          marginTop: 2,
+          marginLeft: 1,
+        }}
+      >
+        Reset
+      </Button>
+      {/* <Button
+        variant="contained"
+        onClick={() => setOpen(true)}
+        sx={{
+          bgcolor: "#FFD700",
+          color: "#000000",
+          "&:hover": {
+            bgcolor: "#FFC107",
+          },
+          marginTop: 2,
+          marginLeft: 1,
+        }}
+      >
+        Open Map
+      </Button> */}
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle sx={{ bgcolor: "#000000", color: "#FFD700" }}>
+          Map View
+        </DialogTitle>
+        <DialogContent sx={{ padding: 0 }}>
+          {selectedRoad && (
+            <MapContainer
+              center={center}
+              zoom={zoom}
+              style={{ height: "60vh", width: "100%", cursor: "pointer" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <MapEventHandler />
+              <RoutingControl routes={routes} onSelectRoute={handleClick} />
+              <FeatureGroup ref={featureGroupRef}>
+                <EditControl
+                  position="topleft"
+                  onCreated={handleCreated}
+                  draw={{
+                    rectangle: false,
+                    circle: false,
+                    circlemarker: false,
+                    marker: false,
+                    polyline: false,
+                  }}
+                />
+              </FeatureGroup>
+            </MapContainer>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpen(false);
+              handleReset();
+            }}
+            sx={{
+              backgroundColor: "#FFC107",
+              border: "#FFC107 solid 1px",
+              color: "black",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#FFC107",
+                color: "black",
+              },
+            }}
+            variant="contained"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 };
 
