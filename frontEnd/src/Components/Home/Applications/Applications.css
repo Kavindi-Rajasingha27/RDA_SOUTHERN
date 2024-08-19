@@ -11,7 +11,9 @@
 
 .application-cards {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; /* Adds space between cards */
 }
 
 .card {
@@ -20,11 +22,13 @@
   text-align: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   color: #ffcc00;
+  width: 100%; /* Full width on small screens */
+  max-width: 300px; /* Limit width on larger screens */
+  flex: 1 1 auto; /* Allows cards to grow and shrink */
 }
 
-.card img {
-  max-width: 100%;
-  height: auto;
+.card i {
+  font-size: 50px;
 }
 
 .card h3 {
@@ -33,4 +37,29 @@
 
 .card p {
   color: #ffffff;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  .applications {
+    padding: 60px 0 30px 0; /* Adjust padding for smaller screens */
+  }
+
+  .card {
+    max-width: 90%; /* Increase card width on small screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .card i {
+    font-size: 40px; /* Smaller icons on very small screens */
+  }
+
+  .card h3 {
+    font-size: 18px; /* Adjust heading size */
+  }
+
+  .card p {
+    font-size: 14px; /* Adjust paragraph size */
+  }
 }

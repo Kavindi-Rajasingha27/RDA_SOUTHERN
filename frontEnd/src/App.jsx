@@ -1,30 +1,3 @@
-// import React from "react";
-// import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-// import TopNav from "./Components/TopNav/TopNav";
-// import Home from "./Pages/Home/Home";
-// import Employees from "./Pages/Employees/Employees";
-// import Map from "./Pages/Map/Map";
-// import Login from "./Pages/Login/Login";
-
-// const App = () => {
-//   return (
-//     <Router>
-//       <div>
-//         <TopNav />
-//         <Routes>
-//           <Route path="/" element={<Home />} />
-//           <Route path="/employees" element={<Employees />} />
-//           <Route path="/map" element={<Map />} />
-//           <Route path="/login" element={<Login />} />
-//         </Routes>
-//       </div>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
-// src/App.js
 import React from "react";
 import {
   Navigate,
@@ -32,6 +5,8 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "./App.css";
 import { AuthProvider, useAuth } from "./AuthContext/AuthContext";
 import EstimatedRoutes from "./Components/Estimate/EstimatedRoutes/EstimatedRoutes";
 import RouteEstimator from "./Components/Estimate/RouteEstimator/RouteEstimator";
@@ -123,6 +98,7 @@ const App = () => {
         <div>
           <TopNav />
           <AppRoutes />
+          <ToastContainer />
         </div>
       </Router>
     </AuthProvider>
