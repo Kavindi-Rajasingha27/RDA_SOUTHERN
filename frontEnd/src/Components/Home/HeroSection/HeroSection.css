@@ -1,0 +1,74 @@
+.hero-section {
+  background: url("../../../assets/header.png") no-repeat center center;
+  background-size: cover;
+  color: #ffcc00;
+  text-align: center;
+  padding: 50px 20px; /* Adjusted padding for smaller screens */
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box; /* Ensures padding is included in the element's total width and height */
+}
+
+.header-content {
+  position: relative; /* Changed from absolute for better responsiveness */
+  width: 100%;
+  max-width: 800px; /* Ensures the content does not stretch too wide */
+  padding: 0 20px; /* Adds padding for smaller screens */
+  box-sizing: border-box; /* Ensures padding is included in the element's total width */
+}
+
+.hero-section h1 {
+  margin: 0 0 20px 0; /* Adjusted margin */
+  font-size: 24px; /* Default font size for small screens */
+}
+
+.hero-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hero-section li {
+  margin: 10px 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Adjusted for better readability */
+  width: calc(100% - 40px); /* Full width with padding */
+  max-width: 450px; /* Restricts width for larger screens */
+  margin: 10px auto; /* Center align with auto margins */
+  padding: 15px 50px; /* Increased padding for better spacing */
+  border-radius: 8px;
+  box-sizing: border-box; /* Ensures padding is included in the element's total width */
+}
+
+.hero-section button {
+  margin-top: 20px;
+  background-color: #ffcc00;
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px; /* Added border radius for better aesthetics */
+}
+
+/* Media Queries for responsiveness */
+@media (min-width: 768px) {
+  .hero-section h1 {
+    font-size: 36px; /* Larger font size for tablets and up */
+  }
+
+  .hero-section li {
+    width: 80%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-section h1 {
+    font-size: 45px; /* Larger font size for desktops */
+  }
+
+  .hero-section li {
+    width: 60%;
+  }
+}

@@ -1,0 +1,44 @@
+.header {
+  background-color: #000000;
+  color: #ffcc00;
+  padding: 10px 0;
+}
+
+.logo {
+  display: inline-block;
+  font-size: 24px;
+}
+
+.nav {
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.nav li {
+  margin-right: 10px;
+}
+
+.nav a {
+  color: #ffcc00;
+  text-decoration: none;
+}
+
+.auth-buttons {
+  float: right;
+}
+
+.auth-buttons button {
+  background-color: #ffcc00;
+  color: #000000;
+  border: none;
+  padding: 5px 10px;
+  margin-left: 5px;
+  cursor: pointer;
+}
