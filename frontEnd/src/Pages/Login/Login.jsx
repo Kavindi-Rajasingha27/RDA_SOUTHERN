@@ -10,6 +10,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../AuthContext/AuthContext";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const [username, setUsername] = useState("assistant_engineer");
@@ -33,7 +34,16 @@ const Login = () => {
 
       if (response.data && response.data.access_token) {
         login(response.data.access_token, response.data.user);
-        navigate("/");
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful!",
+          text: "You will be redirected shortly.",
+          timer: 1500,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate("/");
+        });
       } else {
         setError("Login failed. Please check your credentials.");
       }

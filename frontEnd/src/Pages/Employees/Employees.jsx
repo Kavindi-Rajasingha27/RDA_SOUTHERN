@@ -1,26 +1,77 @@
-import DeleteIcon from "@mui/icons-material/Delete";
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import axios from "axios";
+import * as Yup from "yup";
 import {
-  Box,
-  Button,
-  IconButton,
-  Modal,
-  Paper,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Tabs,
+  Paper,
+  Button,
+  IconButton,
   TextField,
   Typography,
+  Modal,
+  Box,
+  Tabs,
+  Tab,
 } from "@mui/material";
-import axios from "axios";
-import { Field, FieldArray, Form, Formik } from "formik";
-import React, { useEffect, useState } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Formik, Form, Field, FieldArray } from "formik";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
+
+const validationSchema = Yup.object().shape({
+  employee_number: Yup.string()
+    .typeError("Employee ID must be a string")
+    .required("Employee ID is required"),
+  name: Yup.string()
+    .matches(/^[A-Za-z\s]+$/, "Name must only contain letters")
+    .required("Name is required"),
+  contact_details: Yup.string()
+    .matches(/^\d{1,10}$/, "Mobile number must be at most 10 digits")
+    .required("Mobile number is required"),
+  age: Yup.number()
+    .typeError("Age must be a number")
+    .positive("Age must be positive")
+    .integer("Age must be an integer")
+    .max(100, "Age must be at most 100")
+    .required("Age is required"),
+  birthday: Yup.date()
+    .max(
+      new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+      "Must be at least 18 years old"
+    )
+    .required("Birthday is required"),
+  address: Yup.string().required("address is required"),
+  designation: Yup.string().required("Designation is required"),
+  join_date: Yup.date().required("Join date is required"),
+  etf_number: Yup.string().required("ETF number is required"),
+  dependents: Yup.array().of(
+    Yup.object().shape({
+      name: Yup.string()
+        .required("Dependent name is required")
+        .matches(/^[A-Za-z\s]+$/, "Name must only contain letters"),
+      relationship: Yup.string()
+        .required("Relationship is required")
+        .matches(/^[A-Za-z\s]+$/, "Name must only contain letters"),
+      birth_date: Yup.date().required("Birth date is required"),
+    })
+  ),
+
+  qualifications: Yup.array().of(
+    Yup.object().shape({
+      qualification_name: Yup.string().required(
+        "Qualification name is required"
+      ),
+      institute: Yup.string().required("Institute is required"),
+      obtained_date: Yup.date().required("Obtained date is required"),
+    })
+  ),
+});
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
@@ -49,7 +100,12 @@ const Employees = () => {
     fetchEmployees();
   }, []);
 
-  const handleRemoveDependent = async (employeeId, dependentId) => {
+  const handleRemoveDependent = async (
+    employeeId,
+    dependentId,
+    index,
+    remove
+  ) => {
     try {
       await axios.delete(
         `${API_BASE_URL}/employees/${employeeId}/dependents/${dependentId}`,
@@ -98,10 +154,39 @@ const Employees = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_BASE_URL}/employees/${id}`, axiosConfig);
-      setEmployees(employees.filter((employee) => employee.id !== id));
+      // Firstshow a confirmatoin dialog
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#FFC107",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
+
+      // If the user confirms the deletion
+      if (result.isConfirmed) {
+        await axios.delete(`${API_BASE_URL}/employees/${id}`, axiosConfig);
+        setEmployees(employees.filter((employee) => employee.id !== id));
+
+        // Show success message
+        Swal.fire({
+          title: "Deleted!",
+          text: "User has been deleted successfully",
+          icon: "success",
+          confirmButtonColor: "#FFC107",
+        });
+      }
     } catch (error) {
       console.error("Error deleting employee:", error);
+      // Show error message
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete user. Please try again",
+        icon: "error",
+        confirmButtonColor: "#FFC107",
+      });
     }
   };
 
@@ -133,8 +218,24 @@ const Employees = () => {
 
       setEmployees((prev) => [...prev, newEmployee]);
       handleClose();
+
+      //success alert
+      Swal.fire({
+        title: "Success!",
+        text: "User added successfully",
+        icon: "success",
+        confirmButtonColor: "#FFC107",
+      });
     } catch (error) {
       console.error("Error adding employee:", error);
+
+      //error alert
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to add user. Please try again",
+        icon: "error",
+        confirmButtonColor: "#FFC107",
+      });
     }
   };
 
@@ -147,7 +248,6 @@ const Employees = () => {
     setTabIndex(newValue);
   };
 
-  // const handleUpdateEmployee = async (values) => {
   //   try {
   //     const response = await axios.put(
   //       `${API_BASE_URL}/employees/${selectedEmployee.id}`,
@@ -245,8 +345,22 @@ const Employees = () => {
         )
       );
       setSelectedEmployee(updatedEmployee);
+
+      Swal.fire({
+        title: "Success!",
+        text: "User update successfully",
+        icon: "success",
+        confirmButtonColor: "#FFC107",
+      });
     } catch (error) {
       console.error("Error updating employee:", error);
+
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to update user. Please try again",
+        icon: "error",
+        confirmButtonColor: "#FFC107",
+      });
     }
   };
 
@@ -285,11 +399,9 @@ const Employees = () => {
         variant="h6"
         component="div"
         sx={{
-          textAlign: "left",
-          fontSize: "calc(1.325rem + .9vw)",
+          textAlign: "center",
           fontWeight: "bold",
-          paddingLeft: 24,
-          color: "#ffcc00",
+          color: "black",
           marginBottom: 2,
         }}
       >
@@ -422,6 +534,7 @@ const Employees = () => {
                 qualifications: [],
               }
             }
+            validationSchema={validationSchema}
             onSubmit={async (values, { resetForm }) => {
               try {
                 if (selectedEmployee) {
@@ -436,7 +549,7 @@ const Employees = () => {
               }
             }}
           >
-            {({ values, handleSubmit }) => (
+            {({ values, errors, touched, handleSubmit }) => (
               <Form
                 style={{
                   display: "flex",
@@ -466,6 +579,12 @@ const Employees = () => {
                         label="Emp ID"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={
+                          touched.employee_number && errors.employee_number
+                        }
+                        helperText={
+                          touched.employee_number && errors.employee_number
+                        }
                       />
                       <Field
                         name="name"
@@ -473,6 +592,8 @@ const Employees = () => {
                         label="Name"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={touched.name && errors.name}
+                        helperText={touched.name && errors.name}
                       />
                       <Field
                         name="contact_details"
@@ -480,6 +601,12 @@ const Employees = () => {
                         label="Mobile No/ Email"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={
+                          touched.contact_details && errors.contact_details
+                        }
+                        helperText={
+                          touched.contact_details && errors.contact_details
+                        }
                       />
                       <Field
                         name="address"
@@ -487,6 +614,8 @@ const Employees = () => {
                         label="Address"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={touched.address && errors.address}
+                        helperText={touched.address && errors.address}
                       />
                       <Field
                         name="designation"
@@ -494,6 +623,8 @@ const Employees = () => {
                         label="Designation"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={touched.designation && errors.designation}
+                        helperText={touched.designation && errors.designation}
                       />
                       <Field
                         name="age"
@@ -501,6 +632,8 @@ const Employees = () => {
                         label="Age"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={touched.age && errors.age}
+                        helperText={touched.age && errors.age}
                       />
                       <Field
                         name="birthday"
@@ -510,6 +643,8 @@ const Employees = () => {
                         sx={{ mb: 2 }}
                         type="date"
                         InputLabelProps={{ shrink: true }}
+                        error={touched.birthday && errors.birthday}
+                        helperText={touched.birthday && errors.birthday}
                       />
                       <Field
                         name="corporate_title"
@@ -517,6 +652,12 @@ const Employees = () => {
                         label="Corporate Title"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={
+                          touched.corporate_title && errors.corporate_title
+                        }
+                        helperText={
+                          touched.corporate_title && errors.corporate_title
+                        }
                       />
                       <Field
                         name="join_date"
@@ -526,6 +667,8 @@ const Employees = () => {
                         sx={{ mb: 2 }}
                         type="date"
                         InputLabelProps={{ shrink: true }}
+                        error={touched.join_date && errors.join_date}
+                        helperText={touched.join_date && errors.join_date}
                       />
                       <Field
                         name="etf_number"
@@ -533,6 +676,8 @@ const Employees = () => {
                         label="ETF Number"
                         fullWidth
                         sx={{ mb: 2 }}
+                        error={touched.etf_number && errors.etf_number}
+                        helperText={touched.etf_number && errors.etf_number}
                       />
                     </Box>
                   )}
@@ -549,6 +694,14 @@ const Employees = () => {
                                   label="Name"
                                   fullWidth
                                   sx={{ mb: 1 }}
+                                  error={
+                                    touched.dependents?.[index]?.name &&
+                                    errors.dependents?.[index]?.name
+                                  }
+                                  helperText={
+                                    touched.dependents?.[index]?.name &&
+                                    errors.dependents?.[index]?.name
+                                  }
                                 />
                                 <Field
                                   name={`dependents.${index}.relationship`}
@@ -556,6 +709,14 @@ const Employees = () => {
                                   label="Relationship"
                                   fullWidth
                                   sx={{ mb: 1 }}
+                                  error={
+                                    touched.dependents?.[index]?.relationship &&
+                                    errors.dependents?.[index]?.relationship
+                                  }
+                                  helperText={
+                                    touched.dependents?.[index]?.relationship &&
+                                    errors.dependents?.[index]?.relationship
+                                  }
                                 />
                                 <Field
                                   name={`dependents.${index}.birth_date`}
@@ -564,19 +725,30 @@ const Employees = () => {
                                   type="date"
                                   fullWidth
                                   InputLabelProps={{ shrink: true }}
+                                  error={
+                                    touched.dependents?.[index]?.birth_date &&
+                                    errors.dependents?.[index]?.birth_date
+                                  }
+                                  helperText={
+                                    touched.dependents?.[index]?.birth_date &&
+                                    errors.dependents?.[index]?.birth_date
+                                  }
                                 />
                                 <Button
-                                  onClick={() => {
+                                  onClick={async () => {
                                     if (
                                       selectedEmployee &&
                                       values.dependents[index].id
                                     ) {
-                                      handleRemoveDependent(
+                                      await handleRemoveDependent(
                                         selectedEmployee.id,
-                                        values.dependents[index].id
+                                        values.dependents[index].id,
+                                        index,
+                                        remove
                                       );
+                                    } else {
+                                      remove(index);
                                     }
-                                    remove(index);
                                   }}
                                 >
                                   Remove
@@ -612,6 +784,18 @@ const Employees = () => {
                                   label="Qualification Name"
                                   fullWidth
                                   sx={{ mb: 1 }}
+                                  error={
+                                    touched.qualifications?.[index]
+                                      ?.qualification_name &&
+                                    errors.qualifications?.[index]
+                                      ?.qualification_name
+                                  }
+                                  helperText={
+                                    touched.qualifications?.[index]
+                                      ?.qualification_name &&
+                                    errors.qualifications?.[index]
+                                      ?.qualification_name
+                                  }
                                 />
                                 <Field
                                   name={`qualifications.${index}.institute`}
@@ -619,6 +803,16 @@ const Employees = () => {
                                   label="Institute"
                                   fullWidth
                                   sx={{ mb: 1 }}
+                                  error={
+                                    touched.qualifications?.[index]
+                                      ?.institute &&
+                                    errors.qualifications?.[index]?.institute
+                                  }
+                                  helperText={
+                                    touched.qualifications?.[index]
+                                      ?.institute &&
+                                    errors.qualifications?.[index]?.institute
+                                  }
                                 />
                                 <Field
                                   name={`qualifications.${index}.obtained_date`}
@@ -627,6 +821,18 @@ const Employees = () => {
                                   type="date"
                                   fullWidth
                                   InputLabelProps={{ shrink: true }}
+                                  error={
+                                    touched.qualifications?.[index]
+                                      ?.obtained_date &&
+                                    errors.qualifications?.[index]
+                                      ?.obtained_date
+                                  }
+                                  helperText={
+                                    touched.qualifications?.[index]
+                                      ?.obtained_date &&
+                                    errors.qualifications?.[index]
+                                      ?.obtained_date
+                                  }
                                 />
                                 <Button
                                   onClick={() => {
